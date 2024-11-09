@@ -57,8 +57,8 @@ def logout():
 @api.route('/')
 @login_required
 def index():
-    # 只获取当前用户的题目
-    questions = quiz_service.get_user_questions(session['user_id'], 10)
+    # 获取当前用户的所有题目，不再限制数量
+    questions = quiz_service.get_user_questions(session['user_id'])
     return render_template('index.html', questions=questions)
 
 @api.route('/upload', methods=['POST'])

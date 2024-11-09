@@ -4,11 +4,13 @@ from app.database.db import db
 
 class QuizService:
     @staticmethod
-    def get_user_questions(user_id: int, count: int) -> List[Dict]:
-        questions = QAPair.query.filter_by(user_id=user_id)\
-                              .order_by(db.func.random())\
-                              .limit(count)\
-                              .all()
+    def get_user_questions(user_id: int, count: int = None) -> List[Dict]:
+        query = QAPair.query.filter_by(user_id=user_id).order_by(QAPair.id.desc())
+        
+        if count is not None:
+            query = query.limit(count)
+        
+        questions = query.all()
         return [q.to_dict() for q in questions]
     
     @staticmethod
