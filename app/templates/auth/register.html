@@ -1,0 +1,174 @@
+{% extends "base.html" %}
+
+{% block title %}注册 - Quiz System{% endblock %}
+
+{% block extra_style %}
+<style>
+.auth-container {
+    max-width: 400px;
+    margin: 40px auto;
+    padding: 40px;
+    background-color: white;
+    border-radius: 12px;
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+}
+
+.auth-header {
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.auth-header h1 {
+    font-size: 28px;
+    color: #333;
+    margin: 0;
+    font-weight: 600;
+}
+
+.auth-header p {
+    color: #666;
+    margin-top: 10px;
+    font-size: 16px;
+}
+
+.form-group {
+    margin-bottom: 24px;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 8px;
+    color: #333;
+    font-size: 14px;
+    font-weight: 500;
+}
+
+.form-group input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    font-size: 16px;
+    color: #333;
+    transition: all 0.3s ease;
+}
+
+.form-group input:focus {
+    outline: none;
+    border-color: #4A90E2;
+    box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+}
+
+.form-group input::placeholder {
+    color: #999;
+}
+
+.submit-btn {
+    width: 100%;
+    padding: 14px;
+    background-color: #4A90E2;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-size: 16px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.submit-btn:hover {
+    background-color: #357ABD;
+}
+
+.auth-footer {
+    text-align: center;
+    margin-top: 24px;
+    color: #666;
+    font-size: 14px;
+}
+
+.auth-footer a {
+    color: #4A90E2;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.auth-footer a:hover {
+    text-decoration: underline;
+}
+
+.brand {
+    text-align: center;
+    margin-bottom: 32px;
+}
+
+.brand-logo {
+    font-size: 32px;
+    margin-bottom: 8px;
+}
+
+.brand-name {
+    font-size: 20px;
+    color: #333;
+    font-weight: 600;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="auth-container">
+    <div class="brand">
+        <div class="brand-logo">📚</div>
+        <div class="brand-name">Quiz System</div>
+    </div>
+    
+    <div class="auth-header">
+        <h1>创建账号</h1>
+        <p>开始你的学习之旅</p>
+    </div>
+    
+    <form method="POST">
+        <div class="form-group">
+            <label for="username">用户名</label>
+            <input 
+                type="text" 
+                id="username" 
+                name="username" 
+                required 
+                placeholder="请输入用户名"
+                autocomplete="username"
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="email">邮箱</label>
+            <input 
+                type="email" 
+                id="email" 
+                name="email" 
+                required 
+                placeholder="请输入邮箱地址"
+                autocomplete="email"
+            >
+        </div>
+        
+        <div class="form-group">
+            <label for="password">密码</label>
+            <input 
+                type="password" 
+                id="password" 
+                name="password" 
+                required 
+                placeholder="请设置密码"
+                autocomplete="new-password"
+            >
+        </div>
+        
+        <button type="submit" class="submit-btn">注册</button>
+    </form>
+    
+    <div class="auth-footer">
+        <p>已有账号？<a href="{{ url_for('api.login') }}">立即登录</a></p>
+    </div>
+</div>
+{% endblock %} 

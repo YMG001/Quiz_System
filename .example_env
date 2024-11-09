@@ -1,0 +1,18 @@
+DB_USERNAME=quiz_user
+DB_PASSWORD=quiz123
+DB_HOST=localhost
+DB_NAME=quiz_system
+
+# LLM配置
+USE_LOCAL_LLM=true
+LOCAL_LLM_MODEL=llama2
+OPENAI_API_KEY=your-api-key-here
+
+# Flask配置
+SECRET_KEY=your-secret-key-here
+FLASK_DEBUG=1
+FLASK_ENV=development
+FLASK_APP=app
+
+PYTHONPATH=${PYTHONPATH}:${PWD}
+POETRY_VIRTUALENVS_IN_PROJECT=true

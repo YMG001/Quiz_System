@@ -1,0 +1,752 @@
+{% extends "base.html" %}
+
+{% block title %}Quiz System - 答题{% endblock %}
+
+{% block extra_style %}
+<style>
+    .container {
+        max-width: 900px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+
+    /* 文件上传区域样式 */
+    .upload-section {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 30px;
+    }
+
+    .upload-section h2 {
+        font-size: 18px;
+        color: #495057;
+        margin: 0 0 10px 0;
+    }
+
+    .upload-form {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+
+    .upload-form input[type="file"] {
+        flex: 1;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+    }
+
+    .upload-form button {
+        padding: 8px 16px;
+        background-color: #4A90E2;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .upload-form button:hover {
+        background-color: #357ABD;
+    }
+
+    /* 答题区域样式 */
+    .quiz-section {
+        background: white;
+        border-radius: 12px;
+        box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        padding: 30px;
+        min-height: 400px;
+    }
+
+    .quiz-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+        padding-bottom: 15px;
+        border-bottom: 1px solid #e9ecef;
+    }
+
+    .quiz-header h2 {
+        font-size: 24px;
+        color: #333;
+        margin: 0;
+    }
+
+    .progress-info {
+        color: #6c757d;
+        font-size: 16px;
+    }
+
+    .question-card {
+        display: none;
+        opacity: 0;
+        transform: translateY(20px);
+        transition: opacity 0.3s, transform 0.3s;
+    }
+
+    .question-card.active {
+        display: block;
+        opacity: 1;
+        transform: translateY(0);
+    }
+
+    .question-content {
+        margin-bottom: 25px;
+    }
+
+    .question-content h3 {
+        font-size: 20px;
+        color: #333;
+        margin: 0 0 20px 0;
+        line-height: 1.4;
+    }
+
+    .answer {
+        background: #f8f9fa;
+        padding: 20px;
+        border-radius: 8px;
+        margin-bottom: 20px;
+        display: none;
+    }
+
+    .controls {
+        display: flex;
+        gap: 12px;
+        justify-content: flex-end;
+    }
+
+    .control-btn {
+        padding: 10px 20px;
+        border: none;
+        border-radius: 6px;
+        cursor: pointer;
+        font-weight: 500;
+        transition: all 0.3s;
+    }
+
+    .show-answer-btn {
+        background-color: #6c757d;
+        color: white;
+    }
+
+    .show-answer-btn:hover {
+        background-color: #5a6268;
+    }
+
+    .next-btn {
+        background-color: #4A90E2;
+        color: white;
+    }
+
+    .next-btn:hover {
+        background-color: #357ABD;
+    }
+
+    .empty-state {
+        text-align: center;
+        padding: 40px 20px;
+        color: #6c757d;
+    }
+
+    .empty-state p {
+        font-size: 18px;
+        margin-bottom: 20px;
+    }
+
+    /* 键盘快捷键提示 */
+    .keyboard-shortcuts {
+        margin-top: 20px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #6c757d;
+    }
+
+    .keyboard-shortcuts h3 {
+        margin: 0 0 10px 0;
+        font-size: 16px;
+        color: #495057;
+    }
+
+    .shortcuts-list {
+        display: flex;
+        gap: 20px;
+    }
+
+    .shortcut-item {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .key {
+        background: #e9ecef;
+        padding: 2px 6px;
+        border-radius: 4px;
+        font-family: monospace;
+    }
+
+    .form-group {
+        margin-bottom: 15px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 5px;
+        font-weight: 500;
+        color: #495057;
+    }
+
+    .form-group select {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .form-group input[type="file"] {
+        width: 100%;
+        padding: 8px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        background-color: white;
+    }
+
+    .upload-form button {
+        background-color: #4A90E2;
+        color: white;
+        padding: 10px 20px;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-weight: 500;
+    }
+
+    .upload-form button:hover {
+        background-color: #357ABD;
+    }
+
+    /* 模型设置相关样式 */
+    .model-settings {
+        padding: 10px;
+        border: 1px solid #e9ecef;
+        border-radius: 4px;
+        margin-top: 10px;
+    }
+
+    /* 添加一些动画效果 */
+    .form-group select,
+    .form-group input[type="file"] {
+        transition: border-color 0.3s;
+    }
+
+    .form-group select:focus,
+    .form-group input[type="file"]:focus {
+        border-color: #4A90E2;
+        outline: none;
+    }
+
+    /* 模型选择区域样式 */
+    .model-selection {
+        background: white;
+        padding: 20px;
+        border-radius: 8px;
+        border: 1px solid #e9ecef;
+    }
+
+    .model-type-buttons {
+        display: flex;
+        gap: 10px;
+        margin-bottom: 20px;
+    }
+
+    .model-type-buttons input[type="radio"] {
+        display: none;
+    }
+
+    .model-btn {
+        flex: 1;
+        padding: 10px 15px;
+        text-align: center;
+        background: #f8f9fa;
+        border: 2px solid #e9ecef;
+        border-radius: 6px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 500;
+    }
+
+    .model-type-buttons input[type="radio"]:checked+.model-btn {
+        background: #4A90E2;
+        color: white;
+        border-color: #4A90E2;
+    }
+
+    .local-model-input,
+    .jiutian-model-input {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+        margin-top: 15px;
+    }
+
+    .local-model-input input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .local-model-input input[type="text"]:focus {
+        border-color: #4A90E2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .model-hint {
+        margin-top: 8px;
+        font-size: 12px;
+        color: #6c757d;
+    }
+
+    .tooltip-icon {
+        display: inline-block;
+        width: 16px;
+        height: 16px;
+        background: #e9ecef;
+        border-radius: 50%;
+        text-align: center;
+        line-height: 16px;
+        font-size: 12px;
+        color: #495057;
+        cursor: help;
+        margin-left: 5px;
+    }
+
+    .form-actions {
+        margin-top: 20px;
+        text-align: center;
+    }
+
+    .submit-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        background: #4A90E2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.3s ease;
+    }
+
+    .submit-btn:hover {
+        background: #357ABD;
+        transform: translateY(-1px);
+    }
+
+    .btn-icon {
+        font-size: 20px;
+    }
+
+    /* 响应式布局 */
+    @media (max-width: 768px) {
+        .model-type-buttons {
+            flex-direction: column;
+        }
+
+        .model-btn {
+            width: 100%;
+        }
+    }
+
+    .jiutian-model-input {
+        margin-top: 15px;
+        padding: 15px;
+        background: #f8f9fa;
+        border-radius: 6px;
+        border: 1px solid #e9ecef;
+    }
+
+    .jiutian-model-input select {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        transition: border-color 0.3s;
+    }
+
+    .jiutian-model-input select:focus {
+        border-color: #4A90E2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .api-key-section {
+        margin-top: 15px;
+        padding-top: 15px;
+        border-top: 1px solid #e9ecef;
+    }
+
+    .api-key-section input[type="password"],
+    .api-key-section input[type="text"] {
+        width: 100%;
+        padding: 10px;
+        border: 1px solid #ced4da;
+        border-radius: 4px;
+        font-size: 14px;
+        margin-top: 5px;
+        transition: border-color 0.3s;
+    }
+
+    .api-key-section input:focus {
+        border-color: #4A90E2;
+        outline: none;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .show-hide-key {
+        margin-top: 8px;
+        display: flex;
+        align-items: center;
+        gap: 5px;
+    }
+
+    .show-hide-key input[type="checkbox"] {
+        margin: 0;
+    }
+
+    .show-hide-key label {
+        font-size: 12px;
+        color: #6c757d;
+        cursor: pointer;
+    }
+
+    /* 添加错误状态样式 */
+    .api-key-section input.error {
+        border-color: #dc3545;
+    }
+
+    .error-message {
+        color: #dc3545;
+        font-size: 12px;
+        margin-top: 5px;
+        display: none;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container">
+    <form class="upload-form" action="{{ url_for('api.upload_file') }}" method="post" enctype="multipart/form-data">
+        <!-- 文件上传区域 -->
+        <div class="file-upload-section">
+            <h2>上传学习资料</h2>
+            <div class="form-group">
+                <label for="file">选择文件：</label>
+                <input type="file" name="file" id="file" accept=".txt,.pdf,.docx" required>
+            </div>
+        </div>
+
+        <!-- 模型选择区域 -->
+        <div class="model-selection">
+            <div class="form-group">
+                <label>选择模型类型：</label>
+                <div class="model-type-buttons">
+                    <input type="radio" id="local" name="model_type" value="local" checked>
+                    <label for="local" class="model-btn">本地模型 (Ollama)</label>
+
+                    <input type="radio" id="jiutian" name="model_type" value="jiutian">
+                    <label for="jiutian" class="model-btn">九天大模型</label>
+
+                    <input type="radio" id="openai" name="model_type" value="openai">
+                    <label for="openai" class="model-btn">OpenAI</label>
+                </div>
+            </div>
+
+            <!-- 本地模型设置 -->
+            <div class="local-model-input">
+                <label for="local_model">
+                    Ollama 模型名称：
+                    <span class="tooltip-icon" title="输入已安装的 Ollama 模型名称，例如：qwen2:1.5b, mistral, codellama 等">?</span>
+                </label>
+                <input type="text" id="local_model" name="local_model" placeholder="例如：qwen2:1.5b, mistral, codellama"
+                    value="qwen2:1.5b">
+                <div class="model-hint">常用模型：qwen2:1.5b, mistral, codellama, neural-chat</div>
+            </div>
+
+            <!-- 九天模型设置 -->
+            <div class="jiutian-model-input" style="display: none;">
+                <!-- 保持原有内容不变 -->
+                <label for="jiutian_model">
+                    选择九天模型：
+                    <span class="tooltip-icon" title="选择九天平台提供的大语言模型">?</span>
+                </label>
+                <select id="jiutian_model" name="jiutian_model">
+                    <option value="llama3-70b">Llama 3.1-70B</option>
+                    <option value="jiutian-qianwen">九天千问</option>
+                </select>
+                <div class="model-hint">可选择 Llama 3.1-70B 或 九天千问等高性能模型</div>
+
+                <div class="api-key-section">
+                    <label for="jiutian_api_key">
+                        API Key：
+                        <span class="tooltip-icon" title="输入您的九天平台 API Key，用于接口调用鉴权">?</span>
+                    </label>
+                    <input type="password" id="jiutian_api_key" name="jiutian_api_key" placeholder="请输入您的九天平台 API Key"
+                        required>
+                    <div class="show-hide-key">
+                        <input type="checkbox" id="show_key">
+                        <label for="show_key">显示 API Key</label>
+                    </div>
+                    <div class="model-hint">请妥善保管您的 API Key，不要泄露给他人</div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 提交按钮 -->
+        <div class="form-actions">
+            <button type="submit" class="submit-btn">
+                <span class="btn-icon">📤</span>
+                <span class="btn-text">上传并生成题目</span>
+            </button>
+        </div>
+    </form>
+
+    <!-- 答题区域 -->
+    <div class="quiz-section">
+        {% if questions %}
+        <div class="quiz-header">
+            <h2>练习题</h2>
+            <div class="progress-info">
+                题目 <span id="current-question">1</span> / <span id="total-questions">{{ questions|length }}</span>
+            </div>
+        </div>
+
+        <div id="questions-container">
+            {% for qa in questions %}
+            <div class="question-card" data-index="{{ loop.index0 }}">
+                <div class="question-content">
+                    <h3>{{ qa.question }}</h3>
+                    <div class="answer">
+                        {{ qa.answer }}
+                    </div>
+                </div>
+                <div class="controls">
+                    <button class="control-btn show-answer-btn" onclick="toggleAnswer(this)">显示答案</button>
+                    <button class="control-btn next-btn" onclick="nextQuestion()">下一题</button>
+                </div>
+            </div>
+            {% endfor %}
+        </div>
+
+        <div class="keyboard-shortcuts">
+            <h3>键盘快捷键</h3>
+            <div class="shortcuts-list">
+                <div class="shortcut-item">
+                    <span class="key">空格</span>
+                    <span>下一题</span>
+                </div>
+                <div class="shortcut-item">
+                    <span class="key">Enter</span>
+                    <span>显示/隐藏答案</span>
+                </div>
+            </div>
+        </div>
+        {% else %}
+        <div class="empty-state">
+            <p>还没有题目，请先上传学习资料</p>
+        </div>
+        {% endif %}
+    </div>
+</div>
+
+<script>
+    let currentIndex = 0;
+    const questions = document.querySelectorAll('.question-card');
+    const totalQuestions = questions.length;
+
+    function showQuestion(index) {
+        questions.forEach(q => {
+            q.classList.remove('active');
+            const answer = q.querySelector('.answer');
+            if (answer) answer.style.display = 'none';
+        });
+
+        if (questions[index]) {
+            questions[index].classList.add('active');
+            document.getElementById('current-question').textContent = index + 1;
+
+            // 重置按钮文本
+            const button = questions[index].querySelector('.show-answer-btn');
+            if (button) button.textContent = '显示答案';
+        }
+    }
+
+    function toggleAnswer(button) {
+        const card = button.closest('.question-card');
+        const answer = card.querySelector('.answer');
+
+        if (answer.style.display === 'none' || !answer.style.display) {
+            answer.style.display = 'block';
+            button.textContent = '隐藏答案';
+        } else {
+            answer.style.display = 'none';
+            button.textContent = '显示答案';
+        }
+    }
+
+    function nextQuestion() {
+        if (currentIndex < totalQuestions - 1) {
+            currentIndex++;
+            showQuestion(currentIndex);
+        } else {
+            if (confirm('已完成所有题目，是否重新开始？')) {
+                currentIndex = 0;
+                showQuestion(currentIndex);
+            }
+        }
+    }
+
+    // 初始化显示第一题
+    if (totalQuestions > 0) {
+        showQuestion(0);
+    }
+
+    // 键盘快捷键
+    document.addEventListener('keydown', function (event) {
+        if (event.key === ' ' || event.key === 'ArrowRight') {
+            event.preventDefault();
+            nextQuestion();
+        } else if (event.key === 'Enter') {
+            event.preventDefault();
+            const currentCard = document.querySelector('.question-card.active');
+            if (currentCard) {
+                const button = currentCard.querySelector('.show-answer-btn');
+                toggleAnswer(button);
+            }
+        }
+    });
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const modelTypeInputs = document.querySelectorAll('input[name="model_type"]');
+        const localModelInput = document.querySelector('.local-model-input');
+        const jiutianModelInput = document.querySelector('.jiutian-model-input');
+
+        function updateModelInput() {
+            const selectedType = document.querySelector('input[name="model_type"]:checked').value;
+            localModelInput.style.display = 'none';
+            jiutianModelInput.style.display = 'none';
+
+            switch (selectedType) {
+                case 'local':
+                    localModelInput.style.display = 'block';
+                    break;
+                case 'jiutian':
+                    jiutianModelInput.style.display = 'block';
+                    break;
+                case 'openai':
+                    // OpenAI 不需要额外的输入框
+                    break;
+            }
+        }
+
+        modelTypeInputs.forEach(input => {
+            input.addEventListener('change', updateModelInput);
+        });
+
+        updateModelInput(); // 初始化显示状态
+
+        // 添加工具提示
+        const tooltips = document.querySelectorAll('.tooltip-icon');
+        tooltips.forEach(tooltip => {
+            tooltip.addEventListener('mouseover', function (e) {
+                const title = this.getAttribute('title');
+                if (!title) return;
+
+                // 创建工具提示元素
+                const tooltipEl = document.createElement('div');
+                tooltipEl.className = 'tooltip';
+                tooltipEl.textContent = title;
+                document.body.appendChild(tooltipEl);
+
+                // 定位工具提示
+                const rect = this.getBoundingClientRect();
+                tooltipEl.style.position = 'absolute';
+                tooltipEl.style.top = rect.top - tooltipEl.offsetHeight - 5 + 'px';
+                tooltipEl.style.left = rect.left + (rect.width - tooltipEl.offsetWidth) / 2 + 'px';
+
+                // 移除title属性以避免原生工具提示
+                this.removeAttribute('title');
+
+                // 移除工具提示
+                this.addEventListener('mouseout', function () {
+                    tooltipEl.remove();
+                    this.setAttribute('title', title);
+                }, { once: true });
+            });
+        });
+
+        // API Key 显示/隐藏功能
+        const showKeyCheckbox = document.getElementById('show_key');
+        const apiKeyInput = document.getElementById('jiutian_api_key');
+
+        if (showKeyCheckbox && apiKeyInput) {
+            showKeyCheckbox.addEventListener('change', function () {
+                apiKeyInput.type = this.checked ? 'text' : 'password';
+            });
+        }
+
+        // API Key 本地存储功能
+        const savedApiKey = localStorage.getItem('jiutian_api_key');
+        if (savedApiKey && apiKeyInput) {
+            apiKeyInput.value = savedApiKey;
+        }
+
+        // 保存 API Key 到本地存储
+        const uploadForm = document.querySelector('.upload-form');
+        if (uploadForm) {
+            uploadForm.addEventListener('submit', function (e) {
+                const apiKey = apiKeyInput.value;
+                if (apiKey) {
+                    localStorage.setItem('jiutian_api_key', apiKey);
+                }
+            });
+        }
+
+        // API Key 验证
+        function validateApiKey(apiKey) {
+            return apiKey && apiKey.length >= 32; // 假设 API Key 至少需要 32 位
+        }
+
+        if (apiKeyInput) {
+            apiKeyInput.addEventListener('input', function () {
+                const errorMessage = this.parentElement.querySelector('.error-message');
+                if (!validateApiKey(this.value)) {
+                    this.classList.add('error');
+                    if (errorMessage) {
+                        errorMessage.style.display = 'block';
+                    }
+                } else {
+                    this.classList.remove('error');
+                    if (errorMessage) {
+                        errorMessage.style.display = 'none';
+                    }
+                }
+            });
+        }
+    });
+</script>
+{% endblock %}

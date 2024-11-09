@@ -1,0 +1,305 @@
+{% extends "base.html" %}
+
+{% block title %}登录 - Quiz System{% endblock %}
+
+{% block extra_style %}
+<style>
+    * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+
+    body,
+    html {
+        height: 100%;
+        width: 100%;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+        background-color: #f5f7fa;
+    }
+
+    .login-container {
+        display: flex;
+        height: 100vh;
+        max-width: 1200px;
+        margin: 0 auto;
+        background: white;
+        box-shadow: 0 0 20px rgba(0, 0, 0, 0.05);
+    }
+
+    /* 左侧介绍区域 */
+    .intro-section {
+        flex: 1;
+        background: #4A90E2;
+        padding: 40px;
+        color: white;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .intro-content {
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .intro-section h1 {
+        font-size: 36px;
+        margin-bottom: 20px;
+        font-weight: 600;
+    }
+
+    .intro-section p {
+        font-size: 16px;
+        line-height: 1.6;
+        margin-bottom: 30px;
+        opacity: 0.9;
+    }
+
+    .feature-list {
+        list-style: none;
+    }
+
+    .feature-item {
+        display: flex;
+        align-items: center;
+        margin-bottom: 20px;
+        font-size: 16px;
+    }
+
+    .feature-icon {
+        margin-right: 15px;
+        font-size: 24px;
+    }
+
+    /* 右侧登录区域 */
+    .login-section {
+        flex: 1;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .login-box {
+        max-width: 400px;
+        margin: 0 auto;
+        width: 100%;
+    }
+
+    .login-header {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .login-header h2 {
+        font-size: 28px;
+        color: #2d3748;
+        margin-bottom: 10px;
+    }
+
+    .login-header p {
+        color: #718096;
+        font-size: 16px;
+    }
+
+    .form-group {
+        margin-bottom: 24px;
+    }
+
+    .form-group label {
+        display: block;
+        margin-bottom: 8px;
+        color: #4a5568;
+        font-size: 14px;
+        font-weight: 500;
+    }
+
+    .form-group input {
+        width: 100%;
+        padding: 12px 16px;
+        border: 1px solid #e2e8f0;
+        border-radius: 6px;
+        font-size: 15px;
+        color: #2d3748;
+        transition: all 0.3s ease;
+    }
+
+    .form-group input:focus {
+        outline: none;
+        border-color: #4A90E2;
+        box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
+    }
+
+    .remember-me {
+        display: flex;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+
+    .remember-me input[type="checkbox"] {
+        margin-right: 10px;
+        width: 16px;
+        height: 16px;
+    }
+
+    .remember-me label {
+        color: #4a5568;
+        font-size: 14px;
+    }
+
+    .submit-btn {
+        width: 100%;
+        padding: 12px;
+        background: #4A90E2;
+        color: white;
+        border: none;
+        border-radius: 6px;
+        font-size: 16px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: background-color 0.3s;
+    }
+
+    .submit-btn:hover {
+        background: #357ABD;
+    }
+
+    .login-footer {
+        text-align: center;
+        margin-top: 24px;
+    }
+
+    .login-footer p {
+        color: #4a5568;
+        font-size: 14px;
+    }
+
+    .login-footer a {
+        color: #4A90E2;
+        text-decoration: none;
+        font-weight: 500;
+    }
+
+    .login-footer a:hover {
+        text-decoration: underline;
+    }
+
+    .flash-messages {
+        margin-bottom: 24px;
+    }
+
+    .flash {
+        padding: 12px 16px;
+        border-radius: 6px;
+        margin-bottom: 12px;
+        font-size: 14px;
+        display: flex;
+        align-items: center;
+        gap: 8px;
+    }
+
+    .flash.error {
+        background: #fff5f5;
+        color: #c53030;
+        border: 1px solid #feb2b2;
+    }
+
+    .flash.success {
+        background: #f0fff4;
+        color: #2f855a;
+        border: 1px solid #9ae6b4;
+    }
+
+    @media (max-width: 768px) {
+        .intro-section {
+            display: none;
+        }
+
+        .login-section {
+            padding: 40px 20px;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="login-container">
+    <!-- 左侧介绍区域 -->
+    <div class="intro-section">
+        <div class="intro-content">
+            <h1>智能题目生成系统</h1>
+            <p>基于大语言模型的智能学习助手，帮助您更高效地学习和复习。</p>
+
+            <ul class="feature-list">
+                <li class="feature-item">
+                    <span class="feature-icon">📚</span>
+                    <span>自动生成针对性练习题</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">🤖</span>
+                    <span>智能评估学习效果</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">📊</span>
+                    <span>个性化学习数据分析</span>
+                </li>
+                <li class="feature-item">
+                    <span class="feature-icon">🎯</span>
+                    <span>实时跟踪学习进度</span>
+                </li>
+            </ul>
+        </div>
+    </div>
+
+    <!-- 右侧登录区域 -->
+    <div class="login-section">
+        <div class="login-box">
+            <div class="login-header">
+                <h2>欢迎回来</h2>
+                <p>登录您的账号继续学习</p>
+            </div>
+
+            <form method="POST">
+                {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                <div class="flash-messages">
+                    {% for category, message in messages %}
+                    <div class="flash {{ category }}">
+                        <span class="flash-icon">
+                            {% if category == 'error' %}⚠️{% else %}✅{% endif %}
+                        </span>
+                        {{ message }}
+                    </div>
+                    {% endfor %}
+                </div>
+                {% endif %}
+                {% endwith %}
+
+                <div class="form-group">
+                    <label for="username">用户名</label>
+                    <input type="text" id="username" name="username" required placeholder="请输入用户名"
+                        autocomplete="username">
+                </div>
+
+                <div class="form-group">
+                    <label for="password">密码</label>
+                    <input type="password" id="password" name="password" required placeholder="请输入密码"
+                        autocomplete="current-password">
+                </div>
+
+                <div class="remember-me">
+                    <input type="checkbox" id="remember" name="remember">
+                    <label for="remember">记住我</label>
+                </div>
+
+                <button type="submit" class="submit-btn">登录</button>
+
+                <div class="login-footer">
+                    <p>还没有账号？<a href="{{ url_for('api.register') }}">立即注册</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}
